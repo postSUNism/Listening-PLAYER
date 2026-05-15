@@ -1,14 +1,9 @@
 {
   "articles": [
     {
-      "title": "Sample Listening Article",
-      "path": "articles/sample-listening-article.json",
-      "createdAt": "2026-05-15T00:00:00.000Z"
-    }
-    {
       "title": "Flood of Opportunities in Ecological",
       "path": "articles/flood-of-opportunities-in-ecological.json",
-      "createdAt": "2026-05-15T01:00:00.000Z"
+      "createdAt": "2026-05-15T00:00:00.000Z"
     }
   ]
 }

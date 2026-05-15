@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "sample-listening-article",
+  "title": "Sample Listening Article",
+  "createdAt": "2026-05-15T00:00:00.000Z",
+  "sentences": [
+    {
+      "text": "This is a sample listening article.",
+      "audioBase64": null,
+      "altPronunciation": "",
+      "useAltPronunciation": false
+    },
+    {
+      "text": "Upload exported JSON files to the articles folder.",
+      "audioBase64": null,
+      "altPronunciation": "",
+      "useAltPronunciation": false
+    }
+  ]
+}

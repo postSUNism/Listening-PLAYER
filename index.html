@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语精听播放器 | Morandi Glass</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e9e4f0 0%, #d3d9d4 50%, #e2ebf0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --haze-blue: #7b94a1;
+            --haze-blue-deep: #5e7885;
+            --text-main: #4a4a4a;
+            --text-light: #6a6a6a;
+            --danger: #b36f6f;
+            --radius-lg: 24px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 820px;
+            width: 100%;
+        }
+
+        .player-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            min-width: 0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-weight: 300;
+            color: var(--haze-blue-deep);
+            letter-spacing: 2px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .article-selector {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 22px;
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.26);
+            border: 1px solid rgba(255, 255, 255, 0.32);
+        }
+
+        .article-selector label {
+            color: var(--haze-blue-deep);
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        select {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.56);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .status-line {
+            margin: -10px 0 18px;
+            color: var(--text-light);
+            font-size: 0.86rem;
+            text-align: center;
+        }
+
+        .status-line.error {
+            color: var(--danger);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            min-height: 44px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            background: var(--haze-blue);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(123, 148, 161, 0.28);
+            touch-action: manipulation;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--haze-blue-deep);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--haze-blue);
+            border: 1px solid var(--haze-blue);
+            box-shadow: none;
+        }
+
+        .setting-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            color: var(--haze-blue-deep);
+            font-size: 0.9rem;
+        }
+
+        .setting-row input[type="range"] {
+            width: min(260px, 48vw);
+            accent-color: var(--haze-blue);
+        }
+
+        #loopBtn {
+            padding: 7px 12px;
+            min-height: 36px;
+            font-size: 0.82rem;
+        }
+
+        .sentence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sentence-item {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow-wrap: anywhere;
+        }
+
+        .sentence-item:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sentence-item.active {
+            background: rgba(123, 148, 161, 0.15);
+            border-left: 5px solid var(--haze-blue);
+        }
+
+        .index {
+            font-weight: bold;
+            margin-right: 10px;
+            opacity: 0.5;
+        }
+
+        .empty-state {
+            padding: 48px 12px;
+            color: var(--text-light);
+            text-align: center;
+            opacity: 0.72;
+        }
+
+        @media (max-width: 620px) {
+            body {
+                display: block;
+                padding: 14px 10px 24px;
+            }
+
+            .player-card {
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            header {
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: clamp(1.45rem, 8vw, 2rem);
+                letter-spacing: 1px;
+            }
+
+            .article-selector {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .btns {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                width: 100%;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .setting-row {
+                display: grid;
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                width: 100%;
+            }
+
+            .setting-row input[type="range"] {
+                width: 100%;
+            }
+
+            #loopBtn {
+                grid-column: 1 / -1;
+            }
+
+            .sentence-item {
+                padding: 14px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="player-card">
+        <header>
+            <h1>English Listening <span style="font-weight:600">PLAYER</span></h1>
+        </header>
+
+        <div class="article-selector">
+            <label for="articleSelect">选择文章</label>
+            <select id="articleSelect" onchange="handleArticleChange()">
+                <option value="">正在加载文章...</option>
+            </select>
+        </div>
+
+        <div id="articleStatus" class="status-line"></div>
+
+        <div class="controls">
+            <div class="btns">
+                <button onclick="prev()">◀ 上一句</button>
+                <button onclick="togglePlay()" id="playBtn">▶ 播放</button>
+                <button onclick="next()">▶▶ 下一句</button>
+                <button onclick="playAll()" class="secondary">▶▶ 播放全部</button>
+            </div>
+            <div class="setting-row">
+                <span>语速:</span>
+                <input type="range" id="speed" min="0.5" max="1.5" step="0.1" value="1.0" onchange="updateSpeedDisp()">
+                <span id="speedVal">1.0</span>
+                <button onclick="toggleLoop()" id="loopBtn" class="secondary">🔁 循环: 关</button>
+            </div>
+        </div>
+
+        <div id="list" class="sentence-list">
+            <p class="empty-state">正在加载文章...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+const LOCAL_ARTICLE_INDEX = 'articles/index.json';
+let articles = [];
+let data = [];
+let currentArticle = null;
+let currentIndex = -1;
+let isAutoPlaying = false;
+let currentAudio = null;
+let isLoop = false;
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function setStatus(message, isError = false) {
+    const statusEl = document.getElementById('articleStatus');
+    statusEl.textContent = message || '';
+    statusEl.classList.toggle('error', Boolean(isError));
+}
+
+function inferGitHubRepo() {
+    const host = window.location.hostname;
+    if (!host.endsWith('.github.io')) return null;
+
+    const owner = host.replace('.github.io', '');
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+
+    return {
+        owner,
+        repo: pathParts[0] || `${owner}.github.io`
+    };
+}
+
+async function fetchJson(url) {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+    return response.json();
+}
+
+async function loadArticleListFromGitHub() {
+    const repo = inferGitHubRepo();
+    if (!repo) return null;
+
+    const apiUrl = `https://api.github.com/repos/${repo.owner}/${repo.repo}/contents/articles`;
+    const files = await fetchJson(apiUrl);
+    if (!Array.isArray(files)) return [];
+
+    return files
+        .filter(file => file.type === 'file' && file.name.toLowerCase().endsWith('.json') && file.name !== 'index.json')
+        .map(file => ({
+            title: file.name.replace(/\.json$/i, ''),
+            path: file.download_url,
+            createdAt: file.name.slice(0, 14),
+            source: 'github'
+        }));
+}
+
+async function loadArticleListFromLocalIndex() {
+    const index = await fetchJson(LOCAL_ARTICLE_INDEX);
+    if (!Array.isArray(index.articles)) return [];
+
+    return index.articles.map(item => ({
+        title: item.title || item.path || item.id || 'Untitled Article',
+        path: item.path,
+        createdAt: item.createdAt || '',
+        source: 'index'
+    }));
+}
+
+async function loadArticleList() {
+    const select = document.getElementById('articleSelect');
+    select.innerHTML = '<option value="">正在加载文章...</option>';
+    setStatus('');
+
+    try {
+        articles = await loadArticleListFromGitHub();
+    } catch (error) {
+        console.warn(error);
+        articles = null;
+    }
+
+    if (!articles) {
+        try {
+            articles = await loadArticleListFromLocalIndex();
+        } catch (error) {
+            console.warn(error);
+            articles = [];
+        }
+    }
+
+    if (articles.length === 0) {
+        select.innerHTML = '<option value="">暂无文章</option>';
+        document.getElementById('list').innerHTML = '<p class="empty-state">暂无可播放文章，请上传 JSON 到 articles 目录。</p>';
+        setStatus('文章列表加载失败或 articles 目录为空。', true);
+        return;
+    }
+
+    articles.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+
+    select.innerHTML = articles.map((article, index) => (
+        `<option value="${index}">${escapeHtml(article.title || `Article ${index + 1}`)}</option>`
+    )).join('');
+
+    await loadArticleByIndex(0);
+}
+
+async function handleArticleChange() {
+    const selected = Number(document.getElementById('articleSelect').value);
+    if (Number.isNaN(selected)) return;
+    await loadArticleByIndex(selected);
+}
+
+async function loadArticleByIndex(index) {
+    stopAll();
+    currentIndex = -1;
+    currentArticle = articles[index];
+
+    try {
+        const payload = currentArticle.payload || await fetchJson(currentArticle.path);
+        data = Array.isArray(payload) ? payload : payload.sentences || [];
+        currentArticle.title = payload.title || currentArticle.title;
+        currentArticle.createdAt = payload.createdAt || currentArticle.createdAt || '';
+
+        if (!Array.isArray(data) || data.length === 0) {
+            data = [];
+            render();
+            setStatus('这篇文章没有可播放句子。', true);
+            return;
+        }
+
+        render();
+        const sourceText = currentArticle.source === 'github' ? 'GitHub articles 目录' : 'articles/index.json';
+        setStatus(`已加载：${currentArticle.title || 'Untitled Article'} · ${sourceText}`);
+    } catch (error) {
+        console.error(error);
+        data = [];
+        render();
+        setStatus('文章加载失败，请检查 JSON 文件格式。', true);
+    }
+}
+
+function render() {
+    const listEl = document.getElementById('list');
+    if (!data.length) {
+        listEl.innerHTML = '<p class="empty-state">暂无可播放句子。</p>';
+        return;
+    }
+
+    listEl.innerHTML = data.map((s, i) => `
+        <div class="sentence-item" id="item-${i}" onclick="playOne(${i})">
+            <span class="index">${i + 1}</span>
+            <span>${escapeHtml(s.text || '')}</span>
+        </div>
+    `).join('');
+}
+
+function updateSpeedDisp() {
+    const speedVal = document.getElementById('speed').value;
+    document.getElementById('speedVal').innerText = speedVal;
+}
+
+function toggleLoop() {
+    isLoop = !isLoop;
+    document.getElementById('loopBtn').innerText = `🔁 循环: ${isLoop ? '开' : '关'}`;
+}
+
+function getSpeakText(item) {
+    return item.useAltPronunciation && item.altPronunciation && item.altPronunciation.trim()
+        ? item.altPronunciation.trim()
+        : item.text;
+}
+
+function playOne(index, autoNext = false) {
+    if (!data.length || !data[index]) return;
+    stopAll();
+    currentIndex = index;
+    isAutoPlaying = autoNext;
+
+    document.querySelectorAll('.sentence-item').forEach(el => el.classList.remove('active'));
+    const activeEl = document.getElementById('item-' + index);
+    if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const item = data[index];
+    const playbackRate = parseFloat(document.getElementById('speed').value);
+    const speakText = getSpeakText(item);
+
+    if (item.audioBase64 && item.audioBase64.startsWith('data:audio')) {
+        currentAudio = new Audio(item.audioBase64);
+        currentAudio.playbackRate = playbackRate;
+        currentAudio.onended = () => {
+            if (isAutoPlaying || isLoop) playNext();
+            else document.getElementById('playBtn').innerText = '▶ 播放';
+        };
+        currentAudio.play();
+        document.getElementById('playBtn').innerText = '⏸ 暂停';
+    } else {
+        const utterance = new SpeechSynthesisUtterance(speakText);
+        utterance.lang = 'en-US';
+        utterance.rate = playbackRate;
+        utterance.onend = () => {
+            if (isAutoPlaying || isLoop) playNext();
+            else document.getElementById('playBtn').innerText = '▶ 播放';
+        };
+        window.speechSynthesis.speak(utterance);
+        document.getElementById('playBtn').innerText = '⏸ 暂停';
+    }
+}
+
+function prev() {
+    if (!data.length) return;
+    const target = currentIndex <= 0 ? data.length - 1 : currentIndex - 1;
+    playOne(target, isAutoPlaying);
+}
+
+function next() {
+    if (!data.length) return;
+    const target = currentIndex >= data.length - 1 ? 0 : currentIndex + 1;
+    playOne(target, isAutoPlaying);
+}
+
+function playNext() {
+    if (!data.length) return;
+    if (isLoop) {
+        playOne(currentIndex, true);
+    } else if (currentIndex < data.length - 1) {
+        playOne(currentIndex + 1, true);
+    } else {
+        isAutoPlaying = false;
+        document.getElementById('playBtn').innerText = '▶ 播放';
+    }
+}
+
+function playAll() {
+    if (data.length > 0) playOne(0, true);
+}
+
+function togglePlay() {
+    if (currentAudio) {
+        if (currentAudio.paused) {
+            currentAudio.play();
+            document.getElementById('playBtn').innerText = '⏸ 暂停';
+        } else {
+            currentAudio.pause();
+            document.getElementById('playBtn').innerText = '▶ 播放';
+        }
+    } else if (currentIndex >= 0) {
+        playOne(currentIndex, isAutoPlaying);
+    } else {
+        playAll();
+    }
+}
+
+function stopAll() {
+    isAutoPlaying = false;
+    document.getElementById('playBtn').innerText = '▶ 播放';
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    window.speechSynthesis.cancel();
+}
+
+loadArticleList();
+updateSpeedDisp();
+</script>
+</body>
+</html>

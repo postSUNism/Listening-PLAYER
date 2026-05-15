@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Listening Generator PRO | Admin</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e9e4f0 0%, #d3d9d4 50%, #e2ebf0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-strong: rgba(255, 255, 255, 0.62);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --haze-blue: #7b94a1;
+            --haze-blue-deep: #5e7885;
+            --sage-green: #9fb3a0;
+            --danger: #b36f6f;
+            --text-main: #4a4a4a;
+            --text-light: #6a6a6a;
+            --radius-lg: 24px;
+            --radius-sm: 12px;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            min-width: 0;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+
+        header h1 {
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: var(--haze-blue-deep);
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        header p {
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+            gap: 30px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--haze-blue-deep);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            min-width: 0;
+        }
+
+        textarea {
+            height: 330px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: var(--haze-blue);
+            box-shadow: 0 0 15px rgba(123, 148, 161, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            min-height: 44px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: var(--haze-blue);
+            color: white;
+            box-shadow: 0 4px 15px rgba(123, 148, 161, 0.3);
+            touch-action: manipulation;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--haze-blue-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(123, 148, 161, 0.4);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--haze-blue);
+            border: 1px solid var(--haze-blue);
+            box-shadow: none;
+        }
+
+        .btn-export {
+            background: var(--sage-green);
+            box-shadow: 0 4px 15px rgba(159, 179, 160, 0.3);
+        }
+
+        .status-tag {
+            display: none;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.42);
+            color: var(--haze-blue-deep);
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .status-tag.visible {
+            display: inline-flex;
+        }
+
+        .empty-state {
+            color: var(--text-light);
+            text-align: center;
+            margin-top: 140px;
+            opacity: 0.65;
+        }
+
+        .sentence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 650px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sentence-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.24);
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sentence-item.playing {
+            background: rgba(123, 148, 161, 0.15);
+            border-left: 5px solid var(--haze-blue);
+        }
+
+        .sentence-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .sentence-text {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .play-icon {
+            flex: 0 0 auto;
+            min-height: 34px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(123, 148, 161, 0.35);
+            color: var(--haze-blue-deep);
+            background: rgba(255, 255, 255, 0.38);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .sentence-edit-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .alt-pronunciation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 0.86rem;
+        }
+
+        .alt-pronunciation-toggle label {
+            margin: 0;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--text-light);
+            font-size: 0.86rem;
+        }
+
+        .sentence-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .sentence-actions button,
+        .sentence-edit-area button {
+            min-height: 36px;
+            padding: 7px 12px;
+            font-size: 0.78rem;
+        }
+
+        .sentence-actions button {
+            background: #f0f0f0;
+            color: #666;
+            box-shadow: none;
+        }
+
+        .local-note {
+            margin-top: 18px;
+            color: var(--text-light);
+            font-size: 0.86rem;
+        }
+
+        .error-note {
+            color: var(--danger);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            header {
+                margin-bottom: 22px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 14px 10px 24px;
+                display: block;
+            }
+
+            header h1 {
+                font-size: clamp(1.45rem, 8vw, 2rem);
+                letter-spacing: 1.5px;
+                line-height: 1.15;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            textarea {
+                height: 260px;
+                font-size: 0.98rem;
+            }
+
+            .btn-group {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px 16px;
+            }
+
+            .status-tag.visible {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .empty-state {
+                margin-top: 60px;
+            }
+
+            .sentence-list {
+                max-height: none;
+                overflow: visible;
+            }
+
+            .sentence-top {
+                flex-direction: column;
+            }
+
+            .play-icon {
+                width: 100%;
+                text-align: center;
+            }
+
+            .sentence-actions {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .sentence-actions button {
+                width: 100%;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>English Listening Generator <span style="font-weight: 600;">PRO</span></h1>
+        <p>Step by step</p>
+    </header>
+
+    <div class="main-grid">
+        <div class="card">
+            <div class="field">
+                <label for="articleTitle">Article Title</label>
+                <input id="articleTitle" type="text" placeholder="输入文章标题，用于学生端“选择文章”显示">
+            </div>
+
+            <div class="field">
+                <label for="inputText">Content Input</label>
+                <textarea id="inputText" placeholder="在此输入英文文本，系统将自动识别句号、问号进行断句..."></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button onclick="processText()">解析文本</button>
+                <button id="ttsBtn" class="btn-outline" onclick="generateAllAudio()">生成语音</button>
+                <button onclick="exportArticleJson()" class="btn-export">导出学生端 JSON</button>
+                <span id="ttsStatus" class="status-tag">处理中: 0%</span>
+            </div>
+
+            <p class="local-note">
+                线上管理员页会调用本机 <strong>http://127.0.0.1:5000/tts</strong>。请先启动本地 Edge TTS 后端。
+            </p>
+        </div>
+
+        <div class="card">
+            <label>Live Preview</label>
+            <div id="preview-area">
+                <p class="empty-state">等待解析内容...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const TTS_ENDPOINT = 'http://127.0.0.1:5000/tts';
+const SILENT_AUDIO = 'data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==';
+
+let sentences = [];
+let audioCache = {};
+let isGeneratingAudio = false;
+let currentAudioObj = null;
+
+function processText() {
+    const text = document.getElementById('inputText').value;
+    if (!text.trim()) return;
+
+    const regex = /[^.!?]+[.!?]+(?=\s|$)|[^.!?\n]+/g;
+    const matches = text.match(regex) || [];
+    sentences = matches
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => ({
+            text: s,
+            audioBase64: null,
+            altPronunciation: '',
+            useAltPronunciation: false
+        }));
+
+    renderPreview();
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function renderPreview() {
+    const area = document.getElementById('preview-area');
+    if (sentences.length === 0) {
+        area.innerHTML = '<p class="empty-state">等待解析内容...</p>';
+        return;
+    }
+
+    area.innerHTML = `<div class="sentence-list">${sentences.map((s, i) => `
+        <div class="sentence-item" id="sent-${i}">
+            <div class="sentence-top">
+                <div class="sentence-text">${i + 1}. ${escapeHtml(s.text)}</div>
+                <button class="play-icon" onclick="previewSpeak(${i})">
+                    ${s.audioBase64 ? 'READY' : 'TTS'}
+                </button>
+            </div>
+
+            <div class="sentence-edit-area">
+                <button class="btn-outline" onclick="editSentence(${i})">编辑句子</button>
+
+                <div class="alt-pronunciation-toggle">
+                    <input type="checkbox" id="alt-toggle-${i}" ${s.useAltPronunciation ? 'checked' : ''}
+                           onchange="toggleAltPronunciation(${i})">
+                    <label for="alt-toggle-${i}">使用替代发音文本</label>
+                </div>
+
+                <input type="text" id="alt-text-${i}" placeholder="输入替代发音的文本（比如简化/修正发音）"
+                       value="${escapeHtml(s.altPronunciation)}" style="${!s.useAltPronunciation ? 'display:none;' : ''}"
+                       oninput="updateAltText(${i}, this.value)">
+            </div>
+
+            <div class="sentence-actions">
+                <button onclick="deleteSentence(${i})">删除</button>
+                <button onclick="moveSentence(${i}, -1)" ${i === 0 ? 'disabled' : ''}>上移</button>
+                <button onclick="moveSentence(${i}, 1)" ${i === sentences.length - 1 ? 'disabled' : ''}>下移</button>
+            </div>
+        </div>
+    `).join('')}</div>`;
+}
+
+function editSentence(index) {
+    const newText = prompt('修改句子文本：', sentences[index].text);
+    if (newText !== null && newText.trim() !== '') {
+        sentences[index].text = newText.trim();
+        sentences[index].audioBase64 = null;
+        renderPreview();
+    }
+}
+
+function deleteSentence(index) {
+    if (!confirm('确定删除这句话吗？')) return;
+    sentences.splice(index, 1);
+    renderPreview();
+}
+
+function moveSentence(index, direction) {
+    const target = index + direction;
+    if (target < 0 || target >= sentences.length) return;
+    const [item] = sentences.splice(index, 1);
+    sentences.splice(target, 0, item);
+    renderPreview();
+}
+
+function toggleAltPronunciation(index) {
+    sentences[index].useAltPronunciation = document.getElementById(`alt-toggle-${index}`).checked;
+    sentences[index].audioBase64 = null;
+    renderPreview();
+}
+
+function updateAltText(index, value) {
+    sentences[index].altPronunciation = value;
+    sentences[index].audioBase64 = null;
+}
+
+function getSpeakText(item) {
+    return item.useAltPronunciation && item.altPronunciation.trim()
+        ? item.altPronunciation.trim()
+        : item.text;
+}
+
+function previewSpeak(index) {
+    const item = sentences[index];
+    if (currentAudioObj) {
+        currentAudioObj.pause();
+        currentAudioObj = null;
+    }
+    window.speechSynthesis.cancel();
+
+    document.querySelectorAll('.sentence-item').forEach(el => el.classList.remove('playing'));
+    const activeEl = document.getElementById(`sent-${index}`);
+    if (activeEl) activeEl.classList.add('playing');
+
+    const speakText = getSpeakText(item);
+
+    if (item.audioBase64 && item.audioBase64.startsWith('data:audio')) {
+        currentAudioObj = new Audio(item.audioBase64);
+        currentAudioObj.onended = () => {
+            const el = document.getElementById(`sent-${index}`);
+            if (el) el.classList.remove('playing');
+        };
+        currentAudioObj.play();
+    } else {
+        const utterance = new SpeechSynthesisUtterance(speakText);
+        utterance.lang = 'en-US';
+        utterance.onend = () => {
+            const el = document.getElementById(`sent-${index}`);
+            if (el) el.classList.remove('playing');
+        };
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+async function generateAllAudio() {
+    if (sentences.length === 0) {
+        alert('请先解析文本');
+        return;
+    }
+    if (isGeneratingAudio) return;
+
+    const btn = document.getElementById('ttsBtn');
+    const status = document.getElementById('ttsStatus');
+    isGeneratingAudio = true;
+    btn.disabled = true;
+    status.classList.add('visible');
+    status.classList.remove('error-note');
+    status.innerText = '准备连接本地 TTS...';
+
+    for (let i = 0; i < sentences.length; i++) {
+        const item = sentences[i];
+        const ttsText = getSpeakText(item);
+        status.innerText = `Generating: ${Math.round(((i + 1) / sentences.length) * 100)}%`;
+
+        if (audioCache[ttsText]) {
+            item.audioBase64 = audioCache[ttsText];
+            continue;
+        }
+
+        try {
+            const response = await fetch(TTS_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: ttsText })
+            });
+
+            if (!response.ok) {
+                throw new Error(`TTS request failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data.audio || !String(data.audio).startsWith('data:audio')) {
+                throw new Error('TTS response did not include audio data');
+            }
+
+            item.audioBase64 = data.audio;
+            audioCache[ttsText] = data.audio;
+        } catch (error) {
+            console.error(error);
+            item.audioBase64 = SILENT_AUDIO;
+            status.classList.add('error-note');
+            status.innerText = '本地 TTS 连接失败，请确认后端已启动';
+            break;
+        }
+    }
+
+    isGeneratingAudio = false;
+    btn.disabled = false;
+    if (!status.classList.contains('error-note')) {
+        status.innerText = 'Completed';
+    }
+    renderPreview();
+}
+
+function makeArticleTitle() {
+    const typedTitle = document.getElementById('articleTitle').value.trim();
+    if (typedTitle) return typedTitle;
+    if (sentences[0] && sentences[0].text) return sentences[0].text.slice(0, 50);
+    return 'Untitled Listening Article';
+}
+
+function makeArticleId(title) {
+    const datePart = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
+    const titlePart = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 36) || 'article';
+    return `${datePart}-${titlePart}`;
+}
+
+function exportArticleJson() {
+    if (sentences.length === 0) {
+        alert('请先输入并解析内容');
+        return;
+    }
+
+    const hasAudio = sentences.some(s => s.audioBase64 && s.audioBase64.startsWith('data:audio'));
+    if (!hasAudio) {
+        if (!confirm('未生成离线语音，学生端将依赖浏览器内置 TTS，是否继续？')) return;
+    }
+
+    const title = makeArticleTitle();
+    const now = new Date().toISOString();
+    const article = {
+        schemaVersion: 1,
+        id: makeArticleId(title),
+        title,
+        createdAt: now,
+        sentences: sentences.map(item => ({
+            text: item.text,
+            audioBase64: item.audioBase64,
+            altPronunciation: item.altPronunciation || '',
+            useAltPronunciation: Boolean(item.useAltPronunciation)
+        }))
+    };
+
+    const jsonText = JSON.stringify(article, null, 2);
+    const blob = new Blob([jsonText], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${article.id}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
